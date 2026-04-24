@@ -1588,7 +1588,11 @@ class DeviceRequestHandler(BaseHTTPRequestHandler):
         root_file_path = (ROOT_DIR / relative.lstrip("/")).resolve()
         dist_file_path = (FRONTEND_DIST_DIR / relative.lstrip("/")).resolve()
 
-        public_dirs = [ROOT_DIR / "css", ROOT_DIR / "js", ROOT_DIR / "img", FRONTEND_DIST_DIR / "assets"]
+        public_dirs = [
+            ROOT_DIR / "css", ROOT_DIR / "js", ROOT_DIR / "img",
+            FRONTEND_DIST_DIR / "assets", FRONTEND_DIST_DIR / "css",
+            FRONTEND_DIST_DIR / "js", FRONTEND_DIST_DIR / "img"
+        ]
         public_files = {
             ROOT_DIR / "index.html",
             ROOT_DIR / "login.html",

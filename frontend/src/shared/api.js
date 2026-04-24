@@ -1,75 +1,56 @@
-function buildQueryString(query) {
-  const params = new URLSearchParams()
+import axios from 'axios'
 
-  Object.entries(query || {}).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === '') {
-      return
+const apiClient = axios.create({
+  withCredentials: true
+})
+
+apiClient.interceptors.response.use(
+  (response) => {
+    const payload = response.data || {}
+    if (payload.code !== 0) {
+      return Promise.reject(payload)
     }
-    params.set(key, String(value))
+    return payload
+  },
+  (error) => {
+    if (error.response) {
+      if (error.response.status === 401) {
+        window.location.href = '/login.html'
+      }
+      const payload = error.response.data || {}
+      return Promise.reject({
+        code: payload.code || error.response.status,
+        msg: payload.msg || '请求失败'
+      })
+    }
+    return Promise.reject({ code: -1, msg: error.message || '网络错误' })
+  }
+)
+
+function cleanQuery(query) {
+  const cleaned = {}
+  Object.entries(query || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '') {
+      cleaned[key] = value
+    }
   })
-
-  const text = params.toString()
-  return text ? `?${text}` : ''
-}
-
-async function parseResponse(response) {
-  const text = await response.text()
-  let payload = {}
-
-  try {
-    payload = text ? JSON.parse(text) : {}
-  } catch (error) {
-    payload = { code: response.ok ? 0 : response.status, msg: text || '响应解析失败' }
-  }
-
-  if (response.status === 401) {
-    window.location.href = '/login.html'
-    throw payload
-  }
-
-  if (!response.ok || payload.code !== 0) {
-    throw payload
-  }
-
-  return payload
-}
-
-export async function requestJson(url, options = {}) {
-  const response = await fetch(url, {
-    credentials: 'same-origin',
-    ...options
-  })
-  return parseResponse(response)
+  return cleaned
 }
 
 export function getJson(url, query = {}) {
-  return requestJson(`${url}${buildQueryString(query)}`)
+  return apiClient.get(url, { params: cleanQuery(query) })
 }
 
 export function postJson(url, body = {}, query = {}) {
-  return requestJson(`${url}${buildQueryString(query)}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  })
+  return apiClient.post(url, body, { params: cleanQuery(query) })
 }
 
 export function putJson(url, body = {}, query = {}) {
-  return requestJson(`${url}${buildQueryString(query)}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  })
+  return apiClient.put(url, body, { params: cleanQuery(query) })
 }
 
 export function deleteJson(url, query = {}) {
-  return requestJson(`${url}${buildQueryString(query)}`, {
-    method: 'DELETE'
-  })
+  return apiClient.delete(url, { params: cleanQuery(query) })
 }
 
 export function getErrorMessage(error, fallbackText) {
