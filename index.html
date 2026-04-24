@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/index.css">
+    <title>设备环境监测平台大数据</title>
+    <script src="js/jquery-2.2.1.min.js"></script>
+    <script src="js/rem.js"></script>
+    <script src="js/echarts.min.js"></script>
+    <script src="js/guangxi.js"></script>
+    <script src="js/index.js"></script>
+</head>
+<body>
+    <div class="t_container">
+        <header class="t_header">
+            <div class="header_entry_bar">
+                <button id="app_demo_btn" type="button" class="device_action_btn">设备控制</button>
+            </div>
+            <span>设备环境监测平台</span>
+            <div class="header_action_bar">
+                <button id="add_device_btn" type="button" class="device_action_btn">新增设备</button>
+                <button id="delete_device_btn" type="button" class="device_action_btn">删减设备</button>
+                <button id="force_excel_btn" type="button" class="device_action_btn force_btn">强制启动</button>
+            </div>
+        </header>
+        <main class="t_main">
+            <div class="t_left_box">
+                <img class="t_l_line" src="img/left_line.png" alt="">
+                <div class="t_mbox t_rbox">
+                    <i></i>
+                    <span>近五日报错数</span>
+                    <h2 id="metric_error_count">--</h2>
+                </div>
+                <div class="t_mbox t_gbox">
+                    <i></i>
+                    <span>本月新增设备数</span>
+                    <h2 id="metric_new_devices">--</h2>
+                </div>
+                <div class="t_mbox t_ybox">
+                    <i></i>
+                    <span>设备在线消耗</span>
+                    <h2 id="metric_online_devices_1">--</h2>
+                </div>
+                <img class="t_r_line" src="img/right_line.png" alt="">
+            </div>
+            <div class="t_center_box">
+                <div class="t_top_box">
+                    <img class="t_l_line" src="img/left_line.png" alt="">
+                    <ul class="t_nav">
+                        <li>
+                            <span>设备数</span>
+                            <h1 id="metric_total_devices">--</h1>
+                            <i></i>
+                        </li>
+                        <li>
+                            <span>当前在线数量</span>
+                            <h1 id="metric_online_devices_2">--</h1>
+                            <i></i>
+                        </li>
+                        <li>
+                            <span>当日天气</span>
+                            <h1 id="metric_weather_today">--</h1>
+                        </li>
+                    </ul>
+                    <img class="t_r_line" src="img/right_line.png" alt="">
+                </div>
+                <div class="t_bottom_box">
+                    <img class="t_l_line" src="img/left_line.png" alt="">
+                    <div class="weather_switch_bar">
+                        <button id="weather_view_btn" type="button" class="device_action_btn force_btn">天气预报</button>
+                        <button id="rcs_view_btn" type="button" class="device_action_btn">RCS地图</button>
+                    </div>
+                    <div id="weather_view" class="weather_switch_view">
+                        <div id="chart_3" class="echart" style="width: 100%; height: 3.6rem;"></div>
+                    </div>
+                    <div id="rcs_map_view" class="weather_switch_view hidden">
+                        <div class="rcs_map_panel">
+                            <div class="rcs_map_header">
+                                <div>
+                                    <h2>RCS设备地图</h2>
+                                    <p>20个固定槽位，点击空位可新增，点击设备可查看、修改或删减</p>
+                                </div>
+                                <div class="rcs_map_legend">
+                                    <span><i class="rcs_legend_dot rcs_dot_online"></i>在线</span>
+                                    <span><i class="rcs_legend_dot rcs_dot_offline"></i>离线</span>
+                                    <span><i class="rcs_legend_dot rcs_dot_unknown"></i>未知</span>
+                                    <span><i class="rcs_legend_dot rcs_dot_empty"></i>空位</span>
+                                </div>
+                            </div>
+                            <div class="rcs_map_body">
+                                <div class="rcs_map_canvas">
+                                    <div id="rcs_slot_layer" class="rcs_slot_layer"></div>
+                                </div>
+                                <div class="rcs_detail_panel">
+                                    <div class="rcs_detail_top">
+                                        <span id="rcs_slot_title">请选择地图槽位</span>
+                                        <span id="rcs_slot_state" class="rcs_detail_state">待选择</span>
+                                    </div>
+                                    <div class="rcs_detail_metrics">
+                                        <div>设备名称：<span id="rcs_device_name">--</span></div>
+                                        <div>设备ID：<span id="rcs_device_id">--</span></div>
+                                        <div>当前IP：<span id="rcs_device_ip">--</span></div>
+                                        <div>温度：<span id="rcs_device_temp">--</span></div>
+                                        <div>湿度：<span id="rcs_device_humi">--</span></div>
+                                        <div>烟雾：<span id="rcs_device_smoke">--</span></div>
+                                    </div>
+                                    <div class="rcs_detail_tip" id="rcs_detail_tip">空位可直接新增设备到当前槽位。</div>
+                                    <div class="device_form_actions rcs_detail_actions">
+                                        <button id="rcs_add_btn" type="button" class="device_action_btn force_btn">新增到此</button>
+                                        <button id="rcs_edit_btn" type="button" class="device_action_btn hidden">修改设备</button>
+                                        <button id="rcs_delete_btn" type="button" class="device_action_btn hidden">删减设备</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <img class="t_r_line" src="img/right_line.png" alt="">
+                </div>
+            </div>
+            <div class="t_right_box">
+                    <img class="t_l_line" src="img/left_line.png" alt="">
+                    <div id="chart_4" class="echart" style="width: 50%; height: 4.6rem; position: absolute;"></div>
+                    <header class="t_b_h">
+                        <span style="width: 200px;">设备启动成功在线次数</span>
+                        <img src="img/end.png" style="left: 45%;"></img>
+                        <h3 id="total_starts" style="left: 65%;">0<span>次</span></h3>
+                    </header>
+                    <main class="t_b_m">
+                        <img src="img/map.png" alt="">
+                        <div id="dev_info_panel" style="position: absolute; left: 52%; top: 22%; width: 3.19rem; height: 1.67rem; color: #00f0ff; text-align: center; padding-top: 30px; box-sizing: border-box; z-index: 10; font-size: 0.16rem; line-height: 1.8;">
+                            <div>IP: <span id="dev_ip">--</span></div>
+                            <div>名称: <span id="dev_name">--</span></div>
+                            <div>ID: <span id="dev_id">--</span></div>
+                        </div>
+                        <div class="t_b_box">
+                            <span>溫度</span>
+                            <i></i>
+                            <h2 id="dev_temp">--</h2>
+                        </div>
+                        <div class="t_b_box1">
+                            <span>湿度</span>
+                            <i></i>
+                            <h2 id="dev_humi">--</h2>
+                        </div>
+                        <div class="t_b_box2">
+                            <span>烟雾浓度</span>
+                            <i></i>
+                            <h2 id="dev_smoke">--</h2>
+                        </div>
+                        <div class="t_b_box3">
+                            <span>是否在线</span>
+                            <i></i>
+                            <h2 id="dev_online">--</h2>
+                        </div>
+                    </main>
+                    <img class="t_r_line" src="img/right_line.png" alt="">
+            </div>
+            <div class="bottom_row">
+                <div class="b_left_box">
+                        <img class="t_l_line" src="img/left_line.png" alt="">
+                        <div id="chart_2" class="echart" style="width: 100%; height: 3.6rem;"></div>
+                        <img class="t_r_line" src="img/right_line.png" alt="">
+                </div>
+                <div class="b_center_box">
+                        <img class="t_l_line" src="img/left_line.png" alt="">
+                        <div id="chart_1" class="echart" style="width: 100%; height: 3.6rem;"></div>
+                        <img class="t_r_line" src="img/right_line.png" alt="">
+                </div>
+                <div class="b_right_box">
+                        <img class="t_l_line" src="img/left_line.png" alt="">
+                        <h1 class="t_title">告警中心</h1>
+                        <div class="alarm_config_bar">
+                            <label>温度阈值 <input id="alarm_temp_threshold" type="number" step="0.1"></label>
+                            <label>湿度阈值 <input id="alarm_humi_threshold" type="number" step="0.1"></label>
+                            <label>烟雾阈值 <input id="alarm_smoke_threshold" type="number" step="0.1"></label>
+                            <button id="save_alarm_config_btn" type="button" class="device_action_btn alarm_save_btn">保存阈值</button>
+                        </div>
+                        <div id="alarm_table_wrap" class="alarm_table_wrap">
+                            <table class="t_table">
+                                <thead>
+                                    <tr>
+                                        <th>告警ID</th>
+                                        <th>告警规则名称</th>
+                                        <th>告警时间</th>
+                                        <th>告警等级</th>
+                                        <th>处理状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alarm_table_body">
+                                    <tr>
+                                        <td colspan="6">告警加载中...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="alarm_pager">
+                            <button id="alarm_prev_btn" type="button" class="device_action_btn">上一页</button>
+                            <span id="alarm_page_info">1 / 1</span>
+                            <button id="alarm_next_btn" type="button" class="device_action_btn">下一页</button>
+                        </div>
+                        <img class="t_r_line" src="img/right_line.png" alt="">
+                </div>
+            </div>
+        </main>
+    </div>
+    <div id="device_modal" class="device_modal hidden">
+        <div class="device_modal_mask"></div>
+        <div class="device_modal_panel">
+            <h2 id="device_modal_title">新增设备</h2>
+            <form id="device_form">
+                <input id="device_record_id" name="record_id" type="hidden">
+                <div class="device_form_grid">
+                    <label class="device_form_item">
+                        <span>显示名称</span>
+                        <input id="display_name" name="display_name" type="text" placeholder="如：仓库1号设备">
+                    </label>
+                    <label class="device_form_item">
+                        <span>当前IP</span>
+                        <input id="device_ip" name="ip" type="text" placeholder="如：192.168.1.10">
+                    </label>
+                    <label class="device_form_item">
+                        <span>启动成功在线次数</span>
+                        <input id="start_success_count" name="start_success_count" type="number" min="0" value="1">
+                    </label>
+                    <label class="device_form_item">
+                        <span>RCS地图槽位</span>
+                        <select id="slot_index" name="slot_index">
+                            <option value="">自动分配</option>
+                            <option value="1">1号位</option>
+                            <option value="2">2号位</option>
+                            <option value="3">3号位</option>
+                            <option value="4">4号位</option>
+                            <option value="5">5号位</option>
+                            <option value="6">6号位</option>
+                            <option value="7">7号位</option>
+                            <option value="8">8号位</option>
+                            <option value="9">9号位</option>
+                            <option value="10">10号位</option>
+                            <option value="11">11号位</option>
+                            <option value="12">12号位</option>
+                            <option value="13">13号位</option>
+                            <option value="14">14号位</option>
+                            <option value="15">15号位</option>
+                            <option value="16">16号位</option>
+                            <option value="17">17号位</option>
+                            <option value="18">18号位</option>
+                            <option value="19">19号位</option>
+                            <option value="20">20号位</option>
+                        </select>
+                    </label>
+                    <label class="device_form_item">
+                        <span>OneNET设备名称</span>
+                        <input id="onenet_device_name" name="onenet_device_name" type="text" placeholder="必填">
+                    </label>
+                    <label class="device_form_item">
+                        <span>产品ID</span>
+                        <input id="product_id" name="product_id" type="text" placeholder="必填">
+                    </label>
+                    <label class="device_form_item">
+                        <span>用户ID</span>
+                        <input id="user_id" name="user_id" type="text" placeholder="必填">
+                    </label>
+                    <label class="device_form_item">
+                        <span>AccessKey</span>
+                        <input id="access_key" name="access_key" type="text" placeholder="必填">
+                    </label>
+                    <label class="device_form_item">
+                        <span>鉴权版本</span>
+                        <input id="auth_version" name="auth_version" type="text" value="2020-05-29">
+                    </label>
+                    <label class="device_form_item">
+                        <span>设备秘钥</span>
+                        <input id="device_secret" name="device_secret" type="text" placeholder="可选">
+                    </label>
+                    <label class="device_form_item">
+                        <span>设备ID</span>
+                        <input id="device_id_input" name="device_id" type="text" placeholder="可选">
+                    </label>
+                    <label class="device_form_item device_form_item_full">
+                        <span>备注</span>
+                        <input id="device_notes" name="notes" type="text" placeholder="可选">
+                    </label>
+                </div>
+                <div id="delete_device_block" class="device_delete_block hidden">
+                    <label class="device_form_item device_form_item_full">
+                        <span>选择要删减的设备</span>
+                        <select id="delete_device_select"></select>
+                    </label>
+                </div>
+                <div class="device_form_actions">
+                    <button id="device_cancel_btn" type="button" class="device_action_btn">返回主页</button>
+                    <button id="device_submit_btn" type="submit" class="device_action_btn force_btn">确定</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="device_toast" class="device_toast hidden"></div>
+    <div id="alarm_detail_modal" class="device_modal hidden">
+        <div class="device_modal_mask"></div>
+        <div class="device_modal_panel alarm_detail_panel">
+            <h2>告警详情</h2>
+            <div id="alarm_detail_summary" class="alarm_detail_summary"></div>
+            <div class="alarm_detail_section">
+                <h3>处理记录</h3>
+                <div id="alarm_process_records" class="alarm_detail_records"></div>
+            </div>
+            <div class="alarm_detail_section">
+                <h3>同类告警历史</h3>
+                <div id="alarm_history_records" class="alarm_detail_records"></div>
+            </div>
+            <div class="device_form_actions">
+                <button id="alarm_detail_close_btn" type="button" class="device_action_btn force_btn">关闭</button>
+            </div>
+        </div>
+    </div>
+    <div id="alarm_toast" class="alarm_notice hidden">
+        <div class="alarm_notice_inner">
+            <div class="alarm_notice_title">告警提示</div>
+            <div id="alarm_toast_text" class="alarm_notice_text"></div>
+            <button id="alarm_toast_confirm" type="button" class="device_action_btn force_btn">确定</button>
+        </div>
+    </div>
+</body>
+<!--版权所有   青岛研锦网络科技有限公司-->
+</html>

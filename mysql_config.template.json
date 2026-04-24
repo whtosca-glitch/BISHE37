@@ -1,0 +1,17 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8000
+  },
+  "mysql": {
+    "enabled": false,
+    "host": "YOUR_MYSQL_HOST",
+    "port": 3306,
+    "user": "YOUR_MYSQL_USER",
+    "password": "YOUR_MYSQL_PASSWORD",
+    "database": "YOUR_MYSQL_DATABASE",
+    "table": "onenet_devices",
+    "charset": "utf8mb4",
+    "connect_timeout": 30
+  }
+}
